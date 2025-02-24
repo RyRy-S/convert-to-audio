@@ -1,5 +1,3 @@
-
-Markdown
 # convert-to-audio
 
 Convert all video files to MP3 in a single directory or recursively.
