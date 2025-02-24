@@ -1,0 +1,66 @@
+#!/bin/bash
+
+LOGFILE="conversion_errors.log"
+
+# Function to convert video files to MP3
+convert_to_audio() {
+    local FILE=$1
+    if [[ -f "$FILE" ]]; then
+        # Extract the file extension
+        EXT="${FILE##*.}"
+
+        # Check if the file is a video file
+        if [[ "$EXT" =~ ^(mp4|avi|mkv|mov|flv|wmv|webm)$ ]]; then
+            # Convert video file to MP3
+            OUTPUT="${FILE%.*}.mp3"
+            echo "Converting $FILE to $OUTPUT"
+            ffmpeg -i "$FILE" -q:a 0 -map a "$OUTPUT" 2>> "$LOGFILE"
+
+            # Check if the conversion was successful
+            if [[ -f "$OUTPUT" ]]; then
+                echo "Successfully converted $FILE to $OUTPUT"
+                rm "$FILE"
+                echo "Removed original video file: $FILE"
+            else
+                echo "Failed to convert $FILE. See $LOGFILE for details."
+            fi
+        else
+            echo "Skipping non-video file: $FILE"
+        fi
+    else
+        echo "Skipping non-regular file: $FILE"
+    fi
+}
+
+export -f convert_to_audio
+
+# Check for the recursive flag
+if [[ "$1" == "-r" || "$1" == "-recursive" || "$1" == "--recursive" ]]; then
+    RECURSIVE=true
+    DIRECTORY=$2
+else
+    RECURSIVE=false
+    DIRECTORY=$1
+fi
+
+# Ensure the directory exists
+if [[ ! -d "$DIRECTORY" ]]; then
+    echo "Directory $DIRECTORY does not exist."
+    exit 1
+fi
+
+# Create or clear the log file
+> "$LOGFILE"
+
+# Convert files recursively or non-recursively
+if [[ "$RECURSIVE" == true ]]; then
+    find "$DIRECTORY" -type f | while read -r FILE; do
+        convert_to_audio "$FILE"
+    done
+else
+    for FILE in "$DIRECTORY"/*; do
+        convert_to_audio "$FILE"
+    done
+fi
+
+echo "Conversion process completed. Check $LOGFILE for any errors."
