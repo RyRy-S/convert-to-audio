@@ -6,7 +6,7 @@ Convert all video files to MP3 in a single directory or recursively.
 
 - `ffmpeg` must be installed on your system. You can install it using the following commands:
   - On Ubuntu/Debian: `sudo apt-get install ffmpeg`
-  - On Arch: 'sudo pacman -S ffmpeg'
+  - On Arch: `sudo pacman -S ffmpeg`
   - On macOS: `brew install ffmpeg`
   - On Windows: Download and install from the [official site](https://ffmpeg.org/download.html)
 
